@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuis Interaktif Matematika Kelas 11 - Matriks</title>
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  body {
+    background-color: #f0f4f8;
+    color: #1e293b;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+  .container {
+    background: #ffffff;
+    max-width: 800px;
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+  }
+  header {
+    text-align: center;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+  }
+  header h1 {
+    margin: 0 0 8px 0;
+    color: #0f172a;
+    font-size: 1.6rem;
+  }
+  header p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+  .screen {
+    display: none;
+  }
+  .screen.active {
+    display: block;
+  }
+  .start-box {
+    text-align: center;
+    padding: 20px 10px;
+  }
+  .input-group {
+    margin: 20px auto;
+    max-width: 360px;
+    text-align: left;
+  }
+  .input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #334155;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+  }
+  .input-group input:focus {
+    border-color: #2563eb;
+  }
+  .btn {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn:hover {
+    background-color: #1d4ed8;
+  }
+  .btn:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+  }
+  .btn-secondary {
+    background-color: #e2e8f0;
+    color: #1e293b;
+  }
+  .btn-secondary:hover {
+    background-color: #cbd5e1;
+  }
+  .quiz-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    padding: 12px 18px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    font-weight: 600;
+  }
+  .badge {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+  }
+  .timer-badge {
+    background: #fef3c7;
+    color: #b45309;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+  }
+  .question-text {
+    font-size: 1.15rem;
+    line-height: 1.6;
+    margin-bottom: 22px;
+    color: #0f172a;
+  }
+  /* Matrix formatting */
+  .matrix {
+    display: inline-table;
+    vertical-align: middle;
+    border-left: 2px solid #0f172a;
+    border-right: 2px solid #0f172a;
+    border-radius: 6px;
+    padding: 2px 6px;
+    margin: 0 4px;
+    line-height: 1.3;
+  }
+  .matrix-row {
+    display: table-row;
+  }
+  .matrix-cell {
+    display: table-cell;
+    padding: 2px 8px;
+    text-align: center;
+    font-weight: 500;
+  }
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  @media (max-width: 600px) {
+    .options-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .option-btn {
+    background: #f8fafc;
+    border: 2px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.15s;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: #2563eb;
+    background: #eff6ff;
+  }
+  .option-btn.correct {
+    background: #dcfce7;
+    border-color: #16a34a;
+    color: #14532d;
+  }
+  .option-btn.wrong {
+    background: #fee2e2;
+    border-color: #dc2626;
+    color: #7f1d1d;
+  }
+  .option-letter {
+    background: #e2e8f0;
+    color: #334155;
+    font-weight: 700;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .option-btn.correct .option-letter {
+    background: #16a34a;
+    color: #fff;
+  }
+  .option-btn.wrong .option-letter {
+    background: #dc2626;
+    color: #fff;
+  }
+  .explanation-box {
+    background: #f1f5f9;
+    border-left: 4px solid #2563eb;
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    display: none;
+    line-height: 1.5;
+  }
+  .quiz-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .result-summary {
+    text-align: center;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  .result-score {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1d4ed8;
+    margin: 8px 0;
+  }
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    margin-bottom: 24px;
+  }
+  .leaderboard-table th, .leaderboard-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+  }
+  .leaderboard-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 700;
+  }
+  .rank-1 { font-weight: 700; color: #b45309; }
+  .rank-2 { font-weight: 700; color: #475569; }
+  .rank-3 { font-weight: 700; color: #9a3412; }
+  .action-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Kuis Interaktif Matematika Kelas 11</h1>
+    <p>Materi: Matriks (15 Soal Pilihan Ganda + Papan Peringkat Lokal)</p>
+  </header>
+
+  <!-- Start Screen -->
+  <div id="start-screen" class="screen active">
+    <div class="start-box">
+      <h2>Selamat Datang di Kuis Matriks!</h2>
+      <p>Jawab 15 soal pilihan ganda dengan cepat dan tepat untuk mendapatkan poin tertinggi di papan peringkat.</p>
+      <div class="input-group">
+        <label for="student-name">Nama Siswa / Kelas:</label>
+        <input type="text" id="student-name" placeholder="Contoh: Budi Santoso - XI IPA 1" maxlength="40">
+      </div>
+      <button class="btn" onclick="startQuiz()">Mulai Kuis</button>
+    </div>
+  </div>
+
+  <!-- Quiz Screen -->
+  <div id="quiz-screen" class="screen">
+    <div class="quiz-top-bar">
+      <span class="badge" id="question-counter">Soal 1 / 15</span>
+      <span class="timer-badge" id="timer-display">Waktu: 90 dtk</span>
+      <span class="badge" id="score-display">Skor: 0</span>
+    </div>
+
+    <div class="question-text" id="question-text"></div>
+    <div class="options-grid" id="options-container"></div>
+    <div class="explanation-box" id="explanation-box"></div>
+
+    <div class="quiz-footer">
+      <button class="btn" id="next-btn" onclick="nextQuestion()" disabled>Soal Berikutnya &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Result & Leaderboard Screen -->
+  <div id="result-screen" class="screen">
+    <div class="result-summary">
+      <h2 id="result-greeting">Kuis Selesai!</h2>
+      <div class="result-score" id="final-score">0 Poin</div>
+      <p id="result-stats">Jawaban Benar: 0 dari 15 soal</p>
+    </div>
+
+    <h3>🏆 Papan Peringkat Kelas (Perangkat Ini)</h3>
+    <table class="leaderboard-table">
+      <thead>
+        <tr>
+          <th>Peringkat</th>
+          <th>Nama Siswa</th>
+          <th>Benar</th>
+          <th>Total Skor</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboard-body"></tbody>
+    </table>
+
+    <div class="action-row">
+      <button class="btn" onclick="resetToStart()">Siswa Berikutnya / Main Lagi</button>
+      <button class="btn btn-secondary" onclick="clearLeaderboard()">Hapus Riwayat Peringkat</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function m(rows) {
+  let html = '<span class="matrix">';
+  for (let r of rows) {
+    html += '<span class="matrix-row">';
+    for (let c of r) {
+      html += `<span class="matrix-cell">${c}</span>`;
+    }
+    html += '</span>';
+  }
+  html += '</span>';
+  return html;
+}
+
+const questions = [
+  {
+    q: `Diketahui matriks A = ${m([[4, -2, 7], [1, 5, -3]])}. Nilai dari a<sub>23</sub> + a<sub>12</sub> adalah...`,
+    options: ["2", "-5", "5", "9"],
+    answer: 1,
+    explanation: "Elemen a<sub>23</sub> (baris 2 kolom 3) = -3, dan a<sub>12</sub> (baris 1 kolom 2) = -2. Maka -3 + (-2) = -5."
+  },
+  {
+    q: `Jika matriks P = ${m([[3, 8], [-1, 4], [2, 0]])}, maka transpose matriks P (P<sup>T</sup>) adalah...`,
+    options: [
+      m([[3, -1, 2], [8, 4, 0]]),
+      m([[8, 4, 0], [3, -1, 2]]),
+      m([[2, -1, 3], [0, 4, 8]]),
+      m([[3, 8], [2, 0], [-1, 4]])
+    ],
+    answer: 0,
+    explanation: "Baris pada matriks P diubah menjadi kolom pada matriks P<sup>T</sup>."
+  },
+  {
+    q: `Diketahui ${m([["2x", 5], [-3, "y+1"]])} = ${m([[8, 5], [-3, 7]])}. Nilai dari x + y adalah...`,
+    options: ["8", "10", "12", "14"],
+    answer: 1,
+    explanation: "2x = 8 &rarr; x = 4, dan y + 1 = 7 &rarr; y = 6. Jadi, x + y = 4 + 6 = 10."
+  },
+  {
+    q: `Hasil dari ${m([[5, -2], [3, 4]])} + ${m([[-1, 6], [2, -7]])} adalah...`,
+    options: [
+      m([[4, 4], [5, -3]]),
+      m([[6, -8], [1, 11]]),
+      m([[4, 8], [5, 3]]),
+      m([[-4, 4], [5, -3]])
+    ],
+    answer: 0,
+    explanation: "Jumlahkan elemen seletak: 5+(-1)=4, -2+6=4, 3+2=5, 4+(-7)=-3."
+  },
+  {
+    q: `Diketahui A = ${m([[9, 4], [-2, 6]])} dan B = ${m([[3, -1], [5, 2]])}. Hasil dari A - B adalah...`,
+    options: [
+      m([[6, 3], [-7, 4]]),
+      m([[6, 5], [-7, 4]]),
+      m([[12, 3], [3, 8]]),
+      m([[6, 5], [3, 4]])
+    ],
+    answer: 1,
+    explanation: "Kurangkan elemen seletak: 9-3=6, 4-(-1)=5, -2-5=-7, 6-2=4."
+  },
+  {
+    q: `Jika M = ${m([[-2, 4], [0, 3]])}, maka matriks 3M adalah...`,
+    options: [
+      m([[-6, 12], [3, 9]]),
+      m([[6, 12], [0, 9]]),
+      m([[-6, 12], [0, 9]]),
+      m([[-6, 7], [0, 6]])
+    ],
+    answer: 2,
+    explanation: "Kalikan setiap elemen matriks M dengan skalar 3: 3(-2)=-6, 3(4)=12, 3(0)=0, 3(3)=9."
+  },
+  {
+    q: `Diketahui A = ${m([[2, 1], [0, -3]])} dan B = ${m([[4, -2], [1, 5]])}. Hasil dari 2A + B adalah...`,
+    options: [
+      m([[8, 0], [1, -1]]),
+      m([[6, -1], [1, 2]]),
+      m([[8, 4], [1, 11]]),
+      m([[8, 0], [2, -1]])
+    ],
+    answer: 0,
+    explanation: "2A = [[4, 2], [0, -6]], lalu ditambah B menghasilkan [[8, 0], [1, -1]]."
+  },
+  {
+    q: `Hasil dari ${m([[2, 3], [1, 4]])} &times; ${m([[1, 0], [2, 5]])} adalah...`,
+    options: [
+      m([[2, 0], [2, 20]]),
+      m([[8, 15], [9, 20]]),
+      m([[7, 15], [9, 20]]),
+      m([[8, 12], [9, 15]])
+    ],
+    answer: 1,
+    explanation: "Baris kali kolom: [(2&middot;1+3&middot;2), (2&middot;0+3&middot;5)] = [8, 15] dan [(1&middot;1+4&middot;2), (1&middot;0+4&middot;5)] = [9, 20]."
+  },
+  {
+    q: `Matriks A berordo 2 &times; 3 dan matriks B berordo 3 &times; 4. Ordo dari matriks hasil perkalian A &times; B adalah...`,
+    options: ["3 &times; 3", "2 &times; 4", "4 &times; 2", "2 &times; 3"],
+    answer: 1,
+    explanation: "Perkalian matriks (2 &times; 3) dengan (3 &times; 4) menghasilkan matriks berordo 2 &times; 4."
+  },
+  {
+    q: `Determinan dari matriks K = ${m([[6, 4], [2, 3]])} adalah...`,
+    options: ["10", "14", "26", "-10"],
+    answer: 0,
+    explanation: "det(K) = (6 &times; 3) - (4 &times; 2) = 18 - 8 = 10."
+  },
+  {
+    q: `Jika matriks P = ${m([["x", 6], [2, 3]])} merupakan matriks singular, maka nilai x adalah...`,
+    options: ["2", "3", "4", "6"],
+    answer: 2,
+    explanation: "Syarat matriks singular adalah det(P) = 0. Maka 3x - 12 = 0 &rarr; 3x = 12 &rarr; x = 4."
+  },
+  {
+    q: `Nilai determinan dari matriks A = ${m([[1, 2, 0], [3, 1, 2], [0, 1, 1]])} adalah...`,
+    options: ["-5", "-7", "5", "7"],
+    answer: 1,
+    explanation: "Metode Sarrus: (1&middot;1&middot;1 + 2&middot;2&middot;0 + 0&middot;3&middot;1) - (0&middot;1&middot;0 + 1&middot;2&middot;1 + 2&middot;3&middot;1) = 1 - (2 + 6) = -7."
+  },
+  {
+    q: `Invers dari matriks A = ${m([[4, 3], [5, 4]])} adalah...`,
+    options: [
+      m([[4, -3], [-5, 4]]),
+      m([[4, 3], [5, 4]]),
+      m([[-4, 3], [5, -4]]),
+      m([[4, -5], [-3, 4]])
+    ],
+    answer: 0,
+    explanation: "det(A) = 16 - 15 = 1. A<sup>-1</sup> = (1/1) &times; [[4, -3], [-5, 4]] = [[4, -3], [-5, 4]]."
+  },
+  {
+    q: `Diketahui ${m([[2, 1], [3, 2]])} X = ${m([[4], [7]])}. Matriks X yang memenuhi persamaan tersebut adalah...`,
+    options: [
+      m([[1], [2]]),
+      m([[2], [1]]),
+      m([[1], [-2]]),
+      m([[3], [-2]])
+    ],
+    answer: 0,
+    explanation: "X = A<sup>-1</sup>B = [[2, -1], [-3, 2]] &times; [[4], [7]] = [[8-7], [-12+14]] = [[1], [2]]."
+  },
+  {
+    q: `Matriks persegi yang semua elemen di bawah diagonal utamanya bernilai nol disebut matriks...`,
+    options: [
+      "Matriks identitas",
+      "Matriks diagonal",
+      "Matriks segitiga atas",
+      "Matriks segitiga bawah"
+    ],
+    answer: 2,
+    explanation: "Pada matriks segitiga atas, elemen-elemen tak nol berada di bagian atas diagonal utama dan elemen di bawahnya nol."
+  }
+];
+
+let currentIdx = 0;
+let score = 0;
+let correctCount = 0;
+let studentName = "";
+let timerInterval = null;
+let timeLeft = 90;
+let answered = false;
+
+const letters = ["A", "B", "C", "D"];
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function startQuiz() {
+  const nameInput = document.getElementById("student-name").value.trim();
+  if (!nameInput) {
+    alert("Silakan masukkan nama Anda terlebih dahulu.");
+    return;
+  }
+  studentName = nameInput;
+  currentIdx = 0;
+  score = 0;
+  correctCount = 0;
+  showScreen("quiz-screen");
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false;
+  clearInterval(timerInterval);
+  timeLeft = 90;
+  updateTimerDisplay();
+
+  const qObj = questions[currentIdx];
+  document.getElementById("question-counter").textContent = `Soal ${currentIdx + 1} / ${questions.length}`;
+  document.getElementById("score-display").textContent = `Skor: ${score}`;
+  document.getElementById("question-text").innerHTML = qObj.q;
+
+  const optContainer = document.getElementById("options-container");
+  optContainer.innerHTML = "";
+
+  qObj.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectOption(i);
+    optContainer.appendChild(btn);
+  });
+
+  const expBox = document.getElementById("explanation-box");
+  expBox.style.display = "none";
+  expBox.innerHTML = "";
+
+  const nextBtn = document.getElementById("next-btn");
+  nextBtn.disabled = true;
+  nextBtn.innerHTML = currentIdx === questions.length - 1 ? "Lihat Hasil &amp; Peringkat &rarr;" : "Soal Berikutnya &rarr;";
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      handleTimeOut();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  document.getElementById("timer-display").textContent = `Waktu: ${timeLeft} dtk`;
+}
+
+function selectOption(selectedIdx) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInterval);
+
+  const qObj = questions[currentIdx];
+  const buttons = document.querySelectorAll(".option-btn");
+  buttons.forEach(b => b.disabled = true);
+
+  if (selectedIdx === qObj.answer) {
+    buttons[selectedIdx].classList.add("correct");
+    const timeBonus = Math.round((timeLeft / 90) * 40);
+    score += 60 + timeBonus;
+    correctCount++;
+  } else {
+    buttons[selectedIdx].classList.add("wrong");
+    buttons[qObj.answer].classList.add("correct");
+  }
+
+  document.getElementById("score-display").textContent = `Skor: ${score}`;
+  const expBox = document.getElementById("explanation-box");
+  expBox.innerHTML = `<strong>Pembahasan:</strong> ${qObj.explanation}`;
+  expBox.style.display = "block";
+  document.getElementById("next-btn").disabled = false;
+}
+
+function handleTimeOut() {
+  if (answered) return;
+  answered = true;
+  const qObj = questions[currentIdx];
+  const buttons = document.querySelectorAll(".option-btn");
+  buttons.forEach(b => b.disabled = true);
+  buttons[qObj.answer].classList.add("correct");
+
+  const expBox = document.getElementById("explanation-box");
+  expBox.innerHTML = `<strong>Waktu Habis!</strong> ${qObj.explanation}`;
+  expBox.style.display = "block";
+  document.getElementById("next-btn").disabled = false;
+}
+
+function nextQuestion() {
+  currentIdx++;
+  if (currentIdx < questions.length) {
+    loadQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+function finishQuiz() {
+  showScreen("result-screen");
+  document.getElementById("result-greeting").textContent = `Kerja Bagus, ${studentName}!`;
+  document.getElementById("final-score").textContent = `${score} Poin`;
+  document.getElementById("result-stats").textContent = `Jawaban Benar: ${correctCount} dari ${questions.length} soal`;
+
+  saveToLeaderboard(studentName, correctCount, score);
+  renderLeaderboard();
+}
+
+function saveToLeaderboard(name, correct, totalScore) {
+  const key = "kuis_matriks_kelas11_lb";
+  let lb = JSON.parse(localStorage.getItem(key) || "[]");
+  lb.push({ name, correct, score: totalScore, date: Date.now() });
+  lb.sort((a, b) => b.score - a.score || b.correct - a.correct);
+  localStorage.setItem(key, JSON.stringify(lb));
+}
+
+function renderLeaderboard() {
+  const key = "kuis_matriks_kelas11_lb";
+  const lb = JSON.parse(localStorage.getItem(key) || "[]");
+  const tbody = document.getElementById("leaderboard-body");
+  tbody.innerHTML = "";
+
+  lb.forEach((entry, idx) => {
+    const tr = document.createElement("tr");
+    const rankClass = idx === 0 ? "rank-1" : idx === 1 ? "rank-2" : idx === 2 ? "rank-3" : "";
+    const medal = idx === 0 ? "🥇 1" : idx === 1 ? "🥈 2" : idx === 2 ? "🥉 3" : `${idx + 1}`;
+    tr.innerHTML = `
+      <td class="${rankClass}">${medal}</td>
+      <td>${escapeHtml(entry.name)}</td>
+      <td>${entry.correct} / ${questions.length}</td>
+      <td><strong>${entry.score}</strong></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function resetToStart() {
+  document.getElementById("student-name").value = "";
+  showScreen("start-screen");
+}
+
+function clearLeaderboard() {
+  if (confirm("Hapus semua data papan peringkat di perangkat ini?")) {
+    localStorage.removeItem("kuis_matriks_kelas11_lb");
+    renderLeaderboard();
+  }
+}
+</script>
+</body>
+</html>
